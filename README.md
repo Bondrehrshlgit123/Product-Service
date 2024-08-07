@@ -1,5 +1,6 @@
 # Product-Service
 Product Management System
+
 Developed a Product Service REST API using Spring Boot for product management, including CRUD operations and
 categorization, resulting in a 20% increase in data retrieval speed.
 Integrated Hibernate and MySQL for database operations to store and manage product and category data, leading to a 30%
