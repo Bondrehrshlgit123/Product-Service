@@ -2,30 +2,43 @@ package com.example.productservice.controllers;
 
 import com.example.productservice.dtos.GenericCategorydto;
 import com.example.productservice.dtos.GenericProductdto;
+import com.example.productservice.security.JwtData;
+import com.example.productservice.security.TokenValidator;
 import com.example.productservice.services.CategoryService;
 import com.example.productservice.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
+
 @Transactional
 @RestController
 @RequestMapping("/products")
 public class ProductController {
 ProductService productService;
 CategoryService categoryService;
+TokenValidator tokenValidator;
+
 @Autowired
     public ProductController(@org.springframework.beans.factory.annotation.Qualifier("selfstoreproductservice") ProductService productService,
-                             CategoryService categoryService){
+                             CategoryService categoryService, TokenValidator tokenValidator){
         this.productService=productService;
         this.categoryService=categoryService;
+        this.tokenValidator=tokenValidator;
     }
     @GetMapping("/{id}")
-    public GenericProductdto getProductbyId(@PathVariable("id") Long id){
-        GenericProductdto genericProductdto=productService.getProductById(id);
+    public GenericProductdto getProductbyId(@PathVariable("id") Long id,
+                                            @RequestHeader(HttpHeaders.AUTHORIZATION) String auth_token){
+    Optional<JwtData> jwtDataOptional=tokenValidator.validateToken(auth_token);
+
+
+    GenericProductdto genericProductdto=productService.getProductById(id);
+
         if(genericProductdto==null){
             return new GenericProductdto();
         }
