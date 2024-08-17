@@ -1,5 +1,7 @@
 package com.example.productservice.security;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
@@ -17,13 +19,19 @@ public class TokenValidator {
         this.restTemplateBuilder=restTemplateBuilder;
     }
 
-    public Optional<JwtData> validateToken(String token){
+    public Optional<SessionValidateResponseDto> validateToken(String token, Long id){
+
+        ValidateTokenRequestDto validateTokenRequestDto=new ValidateTokenRequestDto();
+        validateTokenRequestDto.setUser_id(id);
+        validateTokenRequestDto.setToken(token);
         RestTemplate restTemplate=restTemplateBuilder.build();
-        ResponseEntity<JwtData> jwtDataResponseEntity=restTemplate.getForEntity(url, JwtData.class,token);
-        if(jwtDataResponseEntity==null)
+        ResponseEntity<SessionValidateResponseDto> sessionValidateResponseDtoResponseEntity
+                =restTemplate.postForEntity(url,validateTokenRequestDto, SessionValidateResponseDto.class);
+        if(sessionValidateResponseDtoResponseEntity==null)
             return null;
-        JwtData jwtData= jwtDataResponseEntity.getBody();
-        Optional<JwtData> jwtDataOptional=Optional.of(jwtData);
-        return jwtDataOptional;
+        SessionValidateResponseDto sessionValidateResponseDto= sessionValidateResponseDtoResponseEntity.getBody();
+        Optional<SessionValidateResponseDto> sessionValidateResponseDtoOptional=
+                Optional.of(sessionValidateResponseDto);
+        return sessionValidateResponseDtoOptional;
     }
 }

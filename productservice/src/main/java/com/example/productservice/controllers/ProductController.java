@@ -2,7 +2,9 @@ package com.example.productservice.controllers;
 
 import com.example.productservice.dtos.GenericCategorydto;
 import com.example.productservice.dtos.GenericProductdto;
+import com.example.productservice.models.SessionStatus;
 import com.example.productservice.security.JwtData;
+import com.example.productservice.security.SessionValidateResponseDto;
 import com.example.productservice.security.TokenValidator;
 import com.example.productservice.services.CategoryService;
 import com.example.productservice.services.ProductService;
@@ -34,7 +36,17 @@ TokenValidator tokenValidator;
     @GetMapping("/{id}")
     public GenericProductdto getProductbyId(@PathVariable("id") Long id,
                                             @RequestHeader(HttpHeaders.AUTHORIZATION) String auth_token){
-    Optional<JwtData> jwtDataOptional=tokenValidator.validateToken(auth_token);
+    Optional< SessionValidateResponseDto> sessionValidateResponseDtoOptional
+            =tokenValidator.validateToken(auth_token,id);
+    if(sessionValidateResponseDtoOptional.isEmpty())
+        throw new IllegalArgumentException("Token invalid");
+    SessionValidateResponseDto sessionValidateResponseDto=sessionValidateResponseDtoOptional.get();
+    String email=sessionValidateResponseDto.getEmail();
+    String role=sessionValidateResponseDto.getRole();
+    SessionStatus sessionStatus=sessionValidateResponseDto.getSessionStatus();
+        System.out.println("email "+email);
+        System.out.println("role "+role);
+        System.out.println("status"+sessionStatus);
 
 
     GenericProductdto genericProductdto=productService.getProductById(id);
